@@ -5,9 +5,14 @@ completing questions in chapter2 of CCI
 Both classes take an integer array as input and the array will be transformed 
 to each list respectively by helper functions.
 """
+from collections import deque
+
 class SinglyLinkedList:
-    def __init__(self, elemList):
-        self.head = self._listToSLL(elemList)
+    def __init__(self, elems):
+        self.head = elems
+        if type(elems) is list:
+            # if input is list, transform it to sll
+            self.head = self._listToSLL(elems)
     
     def __str__(self):
         if not self.head:
@@ -22,8 +27,9 @@ class SinglyLinkedList:
         
         return " -> ".join(sll_list)
     
-    # helper function: transform list to SLL
+    
     def _listToSLL(self, l):
+        # helper function: transform list to SLL
         if len(l) == 0:
             return None
 
@@ -33,6 +39,15 @@ class SinglyLinkedList:
             curr.next = Node(elem)
             curr = curr.next
         return head
+
+    def toList(self):
+        # transform SLL to array/list
+        l = []
+        curr = self.head
+        while curr:
+            l.append(curr.val)
+            curr = curr.next
+        return l
         
 class Node:
     def __init__(self, val):
@@ -48,15 +63,29 @@ class DoublyLinkedList:
         if not self.head:
             return "Error: This is an empty list."
         
+        # print next pointers -> forward order
         dll_list = []
         curr = self.head
-        while curr:
+        last = curr
+        while True:
             dll_list.append(str(curr.val))
+            if not curr.next:
+                last = curr
+                break
             curr = curr.next
-        return " <-> ".join(dll_list)
+        
+        # print prev <- reverse order
+        dll_list_rev = deque()
+        curr = last
+        while curr:
+            dll_list_rev.appendleft(str(curr.val))
+            curr = curr.prev
+
+        return " -> ".join(dll_list) + '\n' + " <- ".join(dll_list_rev)
     
-    # helper function: transform list to DLL
+    
     def _listToDLL(self, l):
+        # helper function: transform list to DLL
         if len(l) == 0:
             return None
         head = DNode(l[0])
@@ -72,6 +101,32 @@ class DoublyLinkedList:
 
         return head
         
+    def check(self):
+        # check if all prev and next pointers match each other
+        if not self.head:
+            return False
+        
+        curr = self.head
+        prev = None
+        while curr:
+            if curr.prev != prev:
+                print(f'{curr.val} and its prev does not match')
+                return False
+            else:
+                prev = curr
+                curr = curr.next
+        return True
+    
+    def toList(self):
+        # transform DLL to array/list
+        l = []
+        if self.check():
+            curr = self.head
+            while curr:
+                l.append(curr.val)
+                curr = curr.next
+        return l
+
 class DNode:
     def __init__(self, val):
         self.val = val
